@@ -492,6 +492,131 @@ sim_mean_sd(100, 6, 3)</code></pre>
 ##   &lt;dbl&gt; &lt;dbl&gt;
 ## 1  5.87  3.18</code></pre>
 </div>
+<div id="lets-review-napoleon-dynamite" class="section level2">
+<h2>Let’s review Napoleon Dynamite</h2>
+<pre class="r"><code>url = &quot;https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&amp;reviewerType=avp_only_reviews&amp;sortBy=recent&amp;pageNumber=1&quot;
+
+dynamite_html = read_html(url)
+
+review_titles = 
+  dynamite_html %&gt;%
+  html_nodes(&quot;.a-text-bold span&quot;) %&gt;%
+  html_text()
+
+review_stars = 
+  dynamite_html %&gt;%
+  html_nodes(&quot;#cm_cr-review_list .review-rating&quot;) %&gt;%
+  html_text() %&gt;%
+  str_extract(&quot;^\\d&quot;) %&gt;%
+  as.numeric()
+
+review_text = 
+  dynamite_html %&gt;%
+  html_nodes(&quot;.review-text-content span&quot;) %&gt;%
+  html_text() %&gt;% 
+  str_replace_all(&quot;\n&quot;, &quot;&quot;) %&gt;% 
+  str_trim()
+
+reviews = 
+  tibble(
+    title = review_titles,
+    stars = review_stars,
+    text = review_text
+  )</code></pre>
+<p>What about the next page of reviews…</p>
+<pre class="r"><code>url = &quot;https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&amp;reviewerType=avp_only_reviews&amp;sortBy=recent&amp;pageNumber=2&quot; ##have changed page 1 to 2
+
+dynamite_html = read_html(url)
+
+review_titles = 
+  dynamite_html %&gt;%
+  html_nodes(&quot;.a-text-bold span&quot;) %&gt;%
+  html_text()
+
+review_stars = 
+  dynamite_html %&gt;%
+  html_nodes(&quot;#cm_cr-review_list .review-rating&quot;) %&gt;%
+  html_text() %&gt;%
+  str_extract(&quot;^\\d&quot;) %&gt;%
+  as.numeric()
+
+review_text = 
+  dynamite_html %&gt;%
+  html_nodes(&quot;.review-text-content span&quot;) %&gt;%
+  html_text() %&gt;% 
+  str_replace_all(&quot;\n&quot;, &quot;&quot;) %&gt;% 
+  str_trim()
+
+reviews_page_2 = 
+  tibble( ##new tibble but this is inefficient
+    title = review_titles,
+    stars = review_stars,
+    text = review_text
+  )</code></pre>
+<p>Let’s turn that code into a function</p>
+<pre class="r"><code>read_page_reviews = function(url) {
+
+  html = read_html(url)
+
+  review_titles = 
+    html %&gt;%
+    html_nodes(&quot;.a-text-bold span&quot;) %&gt;%
+    html_text()
+
+  review_stars = 
+    html %&gt;%
+    html_nodes(&quot;#cm_cr-review_list .review-rating&quot;) %&gt;%
+    html_text() %&gt;%
+    str_extract(&quot;^\\d&quot;) %&gt;%
+    as.numeric()
+
+  review_text = 
+    html %&gt;%
+    html_nodes(&quot;.review-text-content span&quot;) %&gt;%
+    html_text() %&gt;% 
+    str_replace_all(&quot;\n&quot;, &quot;&quot;) %&gt;% 
+    str_trim()
+
+  reviews = 
+    tibble(
+      title = review_titles,
+      stars = review_stars,
+      text = review_text
+    )
+  
+  reviews
+}</code></pre>
+<p>Try my function!</p>
+<pre class="r"><code>dynamite_url = &quot;https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&amp;reviewerType=avp_only_reviews&amp;sortBy=recent&amp;pageNumber=3&quot;
+
+read_page_reviews(dynamite_url)</code></pre>
+<pre><code>## # A tibble: 10 x 3
+##    title                     stars text                                         
+##    &lt;chr&gt;                     &lt;dbl&gt; &lt;chr&gt;                                        
+##  1 Top 5                         5 &quot;Best MOVIE ever! Funny one liners and just …
+##  2 👍                            5 &quot;Exactly as described and came on time 👍&quot;   
+##  3 A top favorite movie !!       5 &quot;Love this movie, needed to add it to my col…
+##  4 Best.Movie!                   5 &quot;I enjoyed showing my children this \&quot;classi…
+##  5 Great Movie                   5 &quot;I love this movie. Showed it to my middle s…
+##  6 Tina, you fat lard, come…     5 &quot;A very quotable, awkard and hilarious movie…
+##  7 Funny!                        4 &quot;It is a great movie although it’s a little …
+##  8 Excellent for families        5 &quot;Highly recommend for family entertainment&quot;  
+##  9 Hilarious!                    5 &quot;Hilarious!&quot;                                 
+## 10 Excellent in all fronts.      5 &quot;Excellent in all fronts.&quot;</code></pre>
+<p>Let’s read a few pages of reviews</p>
+<pre class="r"><code>dynamite_url_base = &quot;https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&amp;reviewerType=avp_only_reviews&amp;sortBy=recent&amp;pageNumber=&quot;
+
+dynamite_urls = str_c(dynamite_url_base, 1:5)
+
+all_reviews = ## this is better than copy pasting the function code, but still running into issue with repeating code
+  bind_rows(
+    read_page_reviews(dynamite_urls[1]),
+    read_page_reviews(dynamite_urls[2]),
+    read_page_reviews(dynamite_urls[3]),
+    read_page_reviews(dynamite_urls[4]),
+    read_page_reviews(dynamite_urls[5])
+  )</code></pre>
+</div>
 
 
 

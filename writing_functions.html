@@ -425,6 +425,73 @@ z_scores(x_vec)</code></pre>
 <pre class="r"><code>z_scores(c(TRUE, TRUE, FALSE, TRUE))</code></pre>
 <pre><code>## Error in z_scores(c(TRUE, TRUE, FALSE, TRUE)): Input must be numeric</code></pre>
 </div>
+<div id="multiple-outputs" class="section level2">
+<h2>Multiple outputs</h2>
+<pre class="r"><code>mean_and_sd = function(x) {
+
+ if(!is.numeric(x)) {
+   stop(&quot;Input must be numeric&quot;)
+ }
+   
+ if(length(x) &lt; 3) {
+   stop(&quot;Must have at least three numbers&quot;)
+ }
+  
+ mean_x = mean(x)
+ sd_x = sd(x)
+  
+ tibble(##instead of return, can also use list
+   mean = mean_x,
+   sd = sd_x
+   )
+  
+}</code></pre>
+<p>Check that the function works.</p>
+<pre class="r"><code>mean_and_sd(x_vec)</code></pre>
+<pre><code>## # A tibble: 1 x 2
+##    mean    sd
+##   &lt;dbl&gt; &lt;dbl&gt;
+## 1  5.25  2.77</code></pre>
+</div>
+<div id="multiple-inputs" class="section level2">
+<h2>Multiple inputs</h2>
+<p>I’d like to do this with a function</p>
+<pre class="r"><code>sim_data = 
+  tibble(
+    x = rnorm(100, mean = 4, sd = 3)
+  )
+
+sim_data %&gt;% 
+  summarize(
+  mean = mean(x),
+  sd = sd(x)
+  )</code></pre>
+<pre><code>## # A tibble: 1 x 2
+##    mean    sd
+##   &lt;dbl&gt; &lt;dbl&gt;
+## 1  4.32  2.54</code></pre>
+<p>The function</p>
+<pre class="r"><code>sim_mean_sd = function(samp_size, mu, sigma) {
+  
+  sim_data = 
+    tibble(
+      x = rnorm(n = samp_size, mean = mu, sd =        sigma)
+  )
+
+  sim_data %&gt;% 
+  summarize(
+  mean = mean(x),
+  sd = sd(x)
+  )
+  
+}
+
+sim_mean_sd(100, 6, 3)</code></pre>
+<pre><code>## # A tibble: 1 x 2
+##    mean    sd
+##   &lt;dbl&gt; &lt;dbl&gt;
+## 1  5.87  3.18</code></pre>
+</div>
 
 
 

@@ -617,6 +617,38 @@ all_reviews = ## this is better than copy pasting the function code, but still r
     read_page_reviews(dynamite_urls[5])
   )</code></pre>
 </div>
+<div id="mean-scoping-example" class="section level2">
+<h2>Mean scoping example</h2>
+<pre class="r"><code>f = function(x) {
+  z = x + y
+  z
+}
+
+x = 1
+y = 2
+
+f(x = y)</code></pre>
+<pre><code>## [1] 4</code></pre>
+</div>
+<div id="functions-as-arguments" class="section level2">
+<h2>Functions as arguments</h2>
+<pre class="r"><code>my_summary = function(x, summ_func) {
+  
+  summ_func(x)
+  
+}
+
+x_vec = rnorm(100, 3, 7)
+
+##use the summary functions
+mean(x_vec)</code></pre>
+<pre><code>## [1] 3.54107</code></pre>
+<pre class="r"><code>median(x_vec)</code></pre>
+<pre><code>## [1] 3.947343</code></pre>
+<pre class="r"><code>## or we can use the function we just created
+my_summary(x_vec, mean)</code></pre>
+<pre><code>## [1] 3.54107</code></pre>
+</div>
 
 
 

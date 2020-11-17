@@ -255,3 +255,35 @@ all_reviews = ## this is better than copy pasting the function code, but still r
 ```
 
 
+## Mean scoping example
+
+```{r}
+f = function(x) {
+  z = x + y
+  z
+}
+
+x = 1
+y = 2
+
+f(x = y)
+```
+
+## Functions as arguments
+
+```{r}
+my_summary = function(x, summ_func) {
+  
+  summ_func(x)
+  
+}
+
+x_vec = rnorm(100, 3, 7)
+
+##use the summary functions
+mean(x_vec)
+median(x_vec)
+## or we can use the function we just created
+my_summary(x_vec, mean)
+```
+

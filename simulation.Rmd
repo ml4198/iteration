@@ -1,0 +1,86 @@
+---
+title: "simulation"
+author: "Matthew Lawlor"
+date: "11/18/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(tidyverse)
+library(rvest)
+
+set.seed(1)
+```
+
+
+## Let's simulate something
+
+Here is a function
+
+```{r}
+sim_mean_sd = function(n, mu = 2, sigma = 3) {
+  
+  sim_data = tibble(
+    x = rnorm(n, mean = mu, sd = sigma),
+  )
+  
+  sim_data %>% 
+    summarize(
+      mean = mean(x),
+      sd = sd(x)
+    )
+}
+```
+
+I can "simulate" by running this line
+
+```{r}
+sim_mean_sd(30)
+```
+
+## Let's simulate a lot
+
+We'll start with a for loop
+
+```{r}
+output = vector("list", length = 100)
+
+for (i in 1:100) {
+  
+  output[[i]] = sim_mean_sd(n = 30)
+  
+}
+
+bind_rows(output)
+```
+
+
+Let's use a loop function from purr instead
+
+```{r}
+sim_results = 
+  rerun(100, sim_mean_sd(n = 30)) %>% 
+  bind_rows()
+```
+
+Let's look at results
+
+```{r}
+sim_results %>% 
+  ggplot(aes(x = mean)) + geom_density()
+
+sim_results %>% 
+  summarize(
+    avg_samp_mean = mean(mean),
+    sd_samp_mean = sd(mean)
+  )
+
+sim_results %>% 
+  ggplot(aes(x = sd)) + geom_density()
+```
+

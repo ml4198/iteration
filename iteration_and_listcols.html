@@ -475,7 +475,72 @@ for (i in 1:4) {
 </div>
 <div id="lets-try-map" class="section level2">
 <h2>Let’s try map!</h2>
-<pre class="r"><code>map(list_norm, mean_and_sd)</code></pre>
+<pre class="r"><code>output = map(list_norm, mean_and_sd)</code></pre>
+<p>What if you want a different function</p>
+<pre class="r"><code>output = map(list_norm, median)</code></pre>
+<pre class="r"><code>output = map_dbl(list_norm, median)##gives a vector instead of a list</code></pre>
+<p>Create an ID vector</p>
+<pre class="r"><code>output = map_df(list_norm, mean_and_sd, .id = &quot;input&quot;)##creates a tibble, id creates an id vector</code></pre>
+</div>
+<div id="list-columns" class="section level2">
+<h2>list columns!</h2>
+<pre class="r"><code>listcol_df =
+  tibble(
+   name = c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;),
+   samp = list_norm
+  )</code></pre>
+<pre class="r"><code>listcol_df %&gt;% pull(name)</code></pre>
+<pre><code>## [1] &quot;a&quot; &quot;b&quot; &quot;c&quot; &quot;d&quot;</code></pre>
+<pre class="r"><code>listcol_df %&gt;% pull(samp)</code></pre>
+<pre><code>## $a
+##  [1] 2.379633 3.042116 2.089078 3.158029 2.345415 4.767287 3.716707 3.910174
+##  [9] 3.384185 4.682176 2.364264 2.538355 4.432282 2.349304 2.792619 2.607192
+## [17] 2.680007 2.720887 3.494188 2.822670
+## 
+## $b
+##  [1] -2.5297873  6.7151941 -1.0728970 -0.8977827 -0.5009537  3.5633315
+##  [7] -0.3678220 -0.1881709 -3.4083024 -1.6213514  0.3008022 -2.9444724
+## [13]  2.6574810 -7.5919704  1.5327893 -7.6822491 -1.5048806 -2.6413995
+## [19] -3.2604739 -0.2844839 -9.5717971  5.8829166 -8.3248622 -2.3176520
+## [25] -5.5796005 -3.7540950 10.4358327  0.0869781 -6.4315027 -8.2030277
+## 
+## $c
+##  [1] 10.090037  9.996288  9.936386  9.814128  9.702508  9.784962 10.200006
+##  [8]  9.875747  9.723115 10.373858 10.085020  9.952271 10.211697 10.177285
+## [15]  9.876151 10.441220  9.948995  9.715101  9.971120 10.041508 10.461596
+## [22] 10.021160 10.091400  9.984569  9.933200  9.993055 10.157528 10.415049
+## [29] 10.205478 10.241582  9.753735 10.196779 10.043985  9.706550 10.104205
+## [36]  9.968249 10.292917  9.846784  9.913958  9.814778
+## 
+## $d
+##  [1] -3.1771040 -2.5979882 -3.7317482 -2.1696268 -4.2080828 -4.0479844
+##  [7] -1.5588423 -4.0158475 -2.5880253 -3.3810761 -2.5905982 -1.3111267
+## [13] -1.4134116 -3.3309078 -5.2852355 -0.5023384 -2.3329338 -2.4586727
+## [19] -3.0133995 -2.4898916</code></pre>
+<pre class="r"><code>listcol_df %&gt;% 
+  filter(name == &quot;a&quot;)</code></pre>
+<pre><code>## # A tibble: 1 x 2
+##   name  samp        
+##   &lt;chr&gt; &lt;named list&gt;
+## 1 a     &lt;dbl [20]&gt;</code></pre>
+<p>Let’s try some operations (this is inefficient but it works)</p>
+<pre class="r"><code>mean_and_sd(listcol_df$samp[[1]]) ##$ same as &quot;pull&quot;</code></pre>
+<pre><code>## # A tibble: 1 x 2
+##    mean    sd
+##   &lt;dbl&gt; &lt;dbl&gt;
+## 1  3.11 0.814</code></pre>
+<pre class="r"><code>mean_and_sd(listcol_df$samp[[2]])</code></pre>
+<pre><code>## # A tibble: 1 x 2
+##    mean    sd
+##   &lt;dbl&gt; &lt;dbl&gt;
+## 1 -1.65  4.61</code></pre>
+<pre class="r"><code>mean_and_sd(listcol_df$samp[[3]])</code></pre>
+<pre><code>## # A tibble: 1 x 2
+##    mean    sd
+##   &lt;dbl&gt; &lt;dbl&gt;
+## 1  10.0 0.208</code></pre>
+<p>Can I just map?</p>
+<pre class="r"><code>map(listcol_df$samp, mean_and_sd)</code></pre>
 <pre><code>## $a
 ## # A tibble: 1 x 2
 ##    mean    sd
@@ -499,8 +564,13 @@ for (i in 1:4) {
 ##    mean    sd
 ##   &lt;dbl&gt; &lt;dbl&gt;
 ## 1 -2.81  1.14</code></pre>
-<p>What if you want a different function</p>
-<pre class="r"><code>output = map(list_norm, IQR)</code></pre>
+<p>Can I add a list column from output?</p>
+<pre class="r"><code>listcol_df =
+  listcol_df %&gt;% 
+  mutate(
+    summary = map(samp, mean_and_sd),
+    medians = map_dbl(samp, median)
+  )</code></pre>
 </div>
 
 
